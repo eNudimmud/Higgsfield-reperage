@@ -1,0 +1,21 @@
+name: ci
+on:
+  push: { branches: [main] }
+  pull_request:
+permissions: { contents: read }
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Web (repérage)
+        working-directory: web
+        run: npm test
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - name: Comfy nodes
+        run: python -m unittest discover -s comfy/tests -v
+      - name: Workflows JSON
+        run: for f in workflows/*.json; do python -m json.tool "$f" > /dev/null; done
